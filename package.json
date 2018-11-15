@@ -1,0 +1,12 @@
+{
+  "name": "api-gateway",
+  "description": "Express Gateway Instance Bootstraped from Command Line",
+  "repository": {},
+  "license": "UNLICENSED",
+  "version": "1.0.0",
+  "main": "server.js",
+  "dependencies": {
+    "express-gateway": "^1.13.0",
+    "express-gateway-jwt-header-auth": "^1.0.0"
+  }
+}

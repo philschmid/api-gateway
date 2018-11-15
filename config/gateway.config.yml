@@ -1,0 +1,41 @@
+http:
+  port: 8080
+admin:
+  port: 9876
+  hostname: localhost
+apiEndpoints:
+  ip: # name, used as reference in pipeline
+    host: 'localhost' # required, '*' will not check for host name
+    paths: /ip # optional, by default will serve all requests - same as *
+  anything:
+    host: 'localhost'
+    paths: /anything
+serviceEndpoints:
+  ip:
+    url: 'https://httpbin.org/'
+  anything:
+    url: 'https://httpbin.org/'
+policies:
+  - jwt-header
+  - proxy
+pipelines:
+  - name: userService
+    apiEndpoints:
+      - ip
+    policies:
+      - jwt-header:
+          - action: # everything under the action will be actionParams
+              role: 'admin'
+      - proxy: # policy name
+          - action:
+              serviceEndpoint: ip # see declaration above
+  - name: appointmentService
+    apiEndpoints:
+      - anything
+    policies:
+      - jwt-header:
+          - action:
+              role: 'Fahrlehrer'
+      - proxy:
+          - action:
+              serviceEndpoint: anything
