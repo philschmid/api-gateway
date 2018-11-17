@@ -35,7 +35,7 @@ pipelines:
     policies:
       - jwt-header:
           - action:
-              role: 'Fahrlehrer'
+              role: 'poweruser'
       - proxy:
           - action:
               serviceEndpoint: anything
