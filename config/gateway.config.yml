@@ -23,16 +23,6 @@ apiEndpoints:
     paths:
       - '/checkAppointment/*'
       - '/getAppointment/*'
-  driverTeacherUser:
-    host: '*'
-    paths:
-      - '/addStudent/*'
-      - '/getAppointment/*'
-
-      ##
-      ##
-      ## Mögliche Endpoints
-      ##
 serviceEndpoints:
   user:
     url: 'https://httpbin.org/'
@@ -59,12 +49,9 @@ pipelines:
       - jwt-header:
           - action: # everything under the action will be actionParams
               role: 'everyone'
-      ### Irgendwie ein If einbauen wie man rausbekommt an welchen Endpoint man möchte
-      # sodas man nicht für jeden Service Endpoint eine Pipeline bauen muss.
       - proxy: # policy name
           - action:
               serviceEndpoint: user # see declaration above
-  ## andere Idee Policy für Endpoint mit Berechtigung aufsteigen.
   - name: everyoneSchedule
     apiEndpoints:
       - everyoneSchedule
@@ -75,7 +62,6 @@ pipelines:
       - proxy: # policy name
           - action:
               serviceEndpoint: schedule # see declaration above
-  ## eigentlich für jeden Endpoint eine Abfrage und dann nach Berechtigung aufTeilen
   - name: everyoneAppointment
     apiEndpoints:
       - everyoneAppointment
