@@ -1,7 +1,5 @@
 # TODO:// Rollen passierende ApiEndpoints nach Service aufgeteilt
 
-
-
 http:
   port: 8080
 admin:
@@ -14,33 +12,33 @@ apiEndpoints:
       - '/ip'
       - '/getUser/*'
       - '/profile/*'
-    methods: ["GET", "OPTIONS","POST"]
+    methods: ['GET', 'OPTIONS', 'POST']
   everyoneSchedule: # Endpoints die nur von Fahrlehrer erreicht werden dürfen
     host: '*'
-    paths: 
+    paths:
       - 'checkSchedule'
-    methods: ["GET", "OPTIONS","POST"]
+    methods: ['GET', 'OPTIONS', 'POST']
   everyoneAppointment:
     host: '*'
-    paths: 
+    paths:
       - '/checkAppointment/*'
       - '/getAppointment/*'
   driverTeacherUser:
     host: '*'
-    paths: 
+    paths:
       - '/addStudent/*'
       - '/getAppointment/*'
 
       ##
       ##
       ## Mögliche Endpoints
-      ## 
+      ##
 serviceEndpoints:
   user:
     url: 'https://httpbin.org/'
-  Appointment:
+  appointment:
     url: 'https://httpbin.org/'
-  Schedule:
+  schedule:
     url: 'https://httpbin.org/'
     ##
     ##
@@ -66,25 +64,25 @@ pipelines:
       - proxy: # policy name
           - action:
               serviceEndpoint: user # see declaration above
-## andere Idee Policy für Endpoint mit Berechtigung aufsteigen. 
-  - name: EnterpriseUser
+  ## andere Idee Policy für Endpoint mit Berechtigung aufsteigen.
+  - name: everyoneSchedule
     apiEndpoints:
-      - everyone
+      - everyoneSchedule
     policies:
       - jwt-header:
           - action: # everything under the action will be actionParams
               role: 'everyone'
       - proxy: # policy name
           - action:
-              serviceEndpoint: user # see declaration above
-## eigentlich für jeden Endpoint eine Abfrage und dann nach Berechtigung aufTeilen 
-  - name: appointmentService
+              serviceEndpoint: schedule # see declaration above
+  ## eigentlich für jeden Endpoint eine Abfrage und dann nach Berechtigung aufTeilen
+  - name: everyoneAppointment
     apiEndpoints:
-      - anything
+      - everyoneAppointment
     policies:
       - jwt-header:
           - action:
-              role: 'poweruser'
+              role: 'everyone'
       - proxy:
           - action:
-              serviceEndpoint: anything
+              serviceEndpoint: appointment
