@@ -1,34 +1,83 @@
+# TODO:// Rollen passierende ApiEndpoints nach Service aufgeteilt
+
+
+
 http:
   port: 8080
 admin:
   port: 9876
   hostname: localhost
 apiEndpoints:
-  ip: # name, used as reference in pipeline
-    host: 'localhost' # required, '*' will not check for host name
-    paths: /ip # optional, by default will serve all requests - same as *
-  anything:
-    host: 'localhost'
-    paths: /anything
+  everyoneUser: # Beschreibung für Policies
+    host: '*' # required, '*' will not check for host name
+    paths: # Array mit allen Endpoints die jeder Erreichen darf
+      - '/ip'
+      - '/getUser/*'
+      - '/profile/*'
+    methods: ["GET", "OPTIONS","POST"]
+  everyoneSchedule: # Endpoints die nur von Fahrlehrer erreicht werden dürfen
+    host: '*'
+    paths: 
+      - 'checkSchedule'
+    methods: ["GET", "OPTIONS","POST"]
+  everyoneAppointment:
+    host: '*'
+    paths: 
+      - '/checkAppointment/*'
+      - '/getAppointment/*'
+  driverTeacherUser:
+    host: '*'
+    paths: 
+      - '/addStudent/*'
+      - '/getAppointment/*'
+
+      ##
+      ##
+      ## Mögliche Endpoints
+      ## 
 serviceEndpoints:
-  ip:
+  user:
     url: 'https://httpbin.org/'
-  anything:
+  Appointment:
     url: 'https://httpbin.org/'
+  Schedule:
+    url: 'https://httpbin.org/'
+    ##
+    ##
+    ## Policies
+    ##
 policies:
   - jwt-header
   - proxy
+##
+##
+## Regeln
+##
 pipelines:
-  - name: userService
+  - name: everyoneUser
     apiEndpoints:
-      - ip
+      - everyoneUser
     policies:
       - jwt-header:
           - action: # everything under the action will be actionParams
-              role: 'admin'
+              role: 'everyone'
+      ### Irgendwie ein If einbauen wie man rausbekommt an welchen Endpoint man möchte
+      # sodas man nicht für jeden Service Endpoint eine Pipeline bauen muss.
       - proxy: # policy name
           - action:
-              serviceEndpoint: ip # see declaration above
+              serviceEndpoint: user # see declaration above
+## andere Idee Policy für Endpoint mit Berechtigung aufsteigen. 
+  - name: EnterpriseUser
+    apiEndpoints:
+      - everyone
+    policies:
+      - jwt-header:
+          - action: # everything under the action will be actionParams
+              role: 'everyone'
+      - proxy: # policy name
+          - action:
+              serviceEndpoint: user # see declaration above
+## eigentlich für jeden Endpoint eine Abfrage und dann nach Berechtigung aufTeilen 
   - name: appointmentService
     apiEndpoints:
       - anything
